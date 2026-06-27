@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Luxe — Sistema de Gestión Hotelera</title>
+  <meta name="description" content="Sistema integral de gestión hotelera: reservaciones, recepción y administración">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Pantalla de carga -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loader-content">
+        <div class="loader-logo">
+          <span class="logo-icon">🏨</span>
+          <h1>Hotel Luxe</h1>
+        </div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-page" class="page">
+      <div class="login-bg">
+        <div class="login-overlay"></div>
+        <div class="login-card glass-card">
+          <div class="login-header">
+            <div class="brand">
+              <span class="brand-icon">🏨</span>
+              <div>
+                <h1 class="brand-name">Hotel Luxe</h1>
+                <p class="brand-tagline">Portal de Acceso</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs para cambiar entre Login y Registro -->
+          <div class="tabs" style="margin-bottom: 24px;">
+            <button type="button" class="tab active" id="tab-btn-login" onclick="switchLoginTab('login')">Ingresar</button>
+            <button type="button" class="tab" id="tab-btn-registro" onclick="switchLoginTab('registro')">Registrarse</button>
+          </div>
+
+          <!-- FORMULARIO DE LOGIN UNIFICADO -->
+          <form id="login-form" class="login-form">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <div class="input-wrapper">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="login-email" placeholder="correo@ejemplo.com" required autocomplete="email">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="login-password">Contraseña</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                <button type="button" class="toggle-pass" onclick="togglePassword('login-password')">👁️</button>
+              </div>
+            </div>
+            <div id="login-error" class="alert alert-error hidden"></div>
+            <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+              <span>Ingresar</span>
+            </button>
+          </form>
+
+          <!-- FORMULARIO DE REGISTRO PARA CLIENTES -->
+          <form id="registro-form" class="login-form hidden" onsubmit="handleClienteRegistro(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-nombres">Nombres *</label>
+                <input type="text" id="reg-nombres" placeholder="Juan" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label for="reg-apellidos">Apellidos *</label>
+                <input type="text" id="reg-apellidos" placeholder="Pérez" class="form-input" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email *</label>
+              <input type="email" id="reg-email" placeholder="correo@ejemplo.com" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Contraseña *</label>
+              <input type="password" id="reg-password" placeholder="Mín. 8 caracteres" class="form-input" required minlength="8">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-tipo-doc">Tipo Doc</label>
+                <select id="reg-tipo-doc" class="form-input">
+                  <option value="DNI">DNI</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="CE">C. Extranjería</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="reg-nro-doc">N° Documento</label>
+                <input type="text" id="reg-nro-doc" placeholder="12345678" class="form-input">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="reg-telefono">Teléfono</label>
+              <input type="tel" id="reg-telefono" placeholder="+51 999 999 999" class="form-input">
+            </div>
+            <div id="registro-error" class="alert alert-error hidden"></div>
+            <div id="registro-success" class="alert alert-success hidden"></div>
+            <button type="submit" class="btn btn-primary btn-full" id="registro-btn">
+              <span>Crear Cuenta</span>
+            </button>
+          </form>
+
+          <div class="login-footer">
+            <p>O continúa como invitado para <a href="#" onclick="continueAsGuest()">ver habitaciones</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTAL WEB (Huéspedes) -->
+    <div id="web-page" class="page hidden">
+      <nav class="web-nav">
+        <div class="nav-brand">
+          <span>🏨</span>
+          <span>Hotel Luxe</span>
+        </div>
+        <div class="nav-links">
+          <a href="#rooms" class="nav-link">Habitaciones</a>
+          <a href="#services" class="nav-link">Servicios</a>
+          <a href="#contact" class="nav-link">Contacto</a>
+          <button class="btn btn-outline-sm" id="nav-login-btn" onclick="showPage('login-page')">Ingresar / Registrarse</button>
+        </div>
+      </nav>
+
+      <!-- Hero -->
+      <section class="hero" id="home">
+        <div class="hero-content">
+          <div class="hero-badge">⭐ Experiencia de Lujo</div>
+          <h1 class="hero-title">Bienvenido al<br><span class="gradient-text">Hotel Luxe</span></h1>
+          <p class="hero-subtitle">Descubre el lujo, el confort y la hospitalidad en cada rincón de nuestra propiedad</p>
+          
+          <!-- Buscador de habitaciones -->
+          <div class="search-card glass-card">
+            <h3>Busca tu habitación ideal</h3>
+            <div class="search-form" id="search-form">
+              <div class="search-field">
+                <label>Check-in</label>
+                <input type="date" id="search-checkin" min="" class="form-input">
+              </div>
+              <div class="search-field">
+                <label>Check-out</label>
+                <input type="date" id="search-checkout" min="" class="form-input">
+              </div>
+              <div class="search-field">
+                <label>Huéspedes</label>
+                <select id="search-guests" class="form-input">
+                  <option value="1">1 persona</option>
+                  <option value="2" selected>2 personas</option>
+                  <option value="3">3 personas</option>
+                  <option value="4">4+ personas</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="buscarDisponibilidad()">
+                🔍 Buscar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resultados de búsqueda -->
+      <section id="results-section" class="section hidden">
+        <div class="container">
+          <h2 class="section-title">Habitaciones Disponibles</h2>
+          <div id="rooms-results" class="rooms-grid"></div>
+        </div>
+      </section>
+
+      <!-- Tipos de habitación -->
+      <section class="section" id="rooms">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-badge">Nuestras Habitaciones</span>
+            <h2 class="section-title">Confort y Elegancia</h2>
+            <p class="section-desc">Cada habitación ha sido diseñada para ofrecerte la máxima comodidad</p>
+          </div>
+          <div id="tipos-habitacion-grid" class="rooms-grid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Servicios -->
+      <section class="section section-dark" id="services">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-badge">Servicios</span>
+            <h2 class="section-title">Todo lo que necesitas</h2>
+          </div>
+          <div class="services-grid">
+            <div class="service-card">
+              <div class="service-icon">🍽️</div>
+              <h3>Restaurante</h3>
+              <p>Gastronomía de primera con cocina internacional</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon">🏊</div>
+              <h3>Piscina</h3>
+              <p>Piscina climatizada disponible las 24 horas</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon">💆</div>
+              <h3>Spa</h3>
+              <p>Tratamientos de relajación y bienestar</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon">🏋️</div>
+              <h3>Gimnasio</h3>
+              <p>Equipamiento de última generación</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon">🚗</div>
+              <h3>Parking</h3>
+              <p>Estacionamiento seguro para huéspedes</p>
+            </div>
+            <div class="service-card">
+              <div class="service-icon">🛎️</div>
+              <h3>Room Service</h3>
+              <p>Servicio a habitaciones 24/7</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer web -->
+      <footer class="web-footer" id="contact">
+        <div class="container">
+          <div class="footer-grid">
+            <div>
+              <h3>🏨 Hotel Luxe</h3>
+              <p>Tu experiencia perfecta nos inspira cada día</p>
+            </div>
+            <div>
+              <h4>Contacto</h4>
+              <p id="footer-direccion">📍 Av. Principal 123, Lima</p>
+              <p id="footer-telefono">📞 +51 1 234-5678</p>
+              <p id="footer-email">✉️ info@hotelluxe.pe</p>
+            </div>
+            <div>
+              <h4>Horarios</h4>
+              <p id="footer-checkin">Check-in: 15:00</p>
+              <p id="footer-checkout">Check-out: 12:00</p>
+              <p id="footer-recepcion">Recepción: 24/7</p>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>© 2026 Hotel Luxe. Sistema de Gestión v1.0</p>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Modal de Reserva -->
+      <div id="modal-reserva" class="modal-overlay hidden">
+        <div class="modal glass-card">
+          <div class="modal-header">
+            <h2>Completar Reserva</h2>
+            <button class="btn-close" onclick="closeModal('modal-reserva')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div id="reserva-habitacion-info" class="habitacion-summary"></div>
+            <form id="form-reserva-web">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Adultos</label>
+                  <select id="r-adultos" class="form-input">
+                    <option value="1">1 adulto</option>
+                    <option value="2" selected>2 adultos</option>
+                    <option value="3">3 adultos</option>
+                    <option value="4">4 adultos</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Niños</label>
+                  <select id="r-ninos" class="form-input">
+                    <option value="0" selected>Sin niños</option>
+                    <option value="1">1 niño</option>
+                    <option value="2">2 niños</option>
+                    <option value="3">3 niños</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Notas especiales</label>
+                <textarea id="r-notas" class="form-input" rows="2" placeholder="Alergias, preferencias, llegada tardía..."></textarea>
+              </div>
+              <div id="reserva-error" class="alert alert-error hidden"></div>
+              <div id="reserva-success" class="alert alert-success hidden"></div>
+              <button type="submit" class="btn btn-primary btn-full">
+                ✅ Confirmar Reserva
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIS RESERVAS CLIENTE -->
+    <div id="mis-reservas-page" class="page hidden">
+      <nav class="web-nav">
+        <div class="nav-brand">
+          <span>🏨</span>
+          <span>Hotel Luxe</span>
+        </div>
+        <div class="nav-links-reservas" style="display:flex;align-items:center;gap:20px;">
+          <a href="#" onclick="showPage('web-page')" class="nav-link" style="color:#ffffff; font-weight:600;">← Volver al Portal</a>
+          <button class="btn btn-outline-sm" onclick="logoutCliente()">Cerrar Sesión</button>
+        </div>
+      </nav>
+
+      <div class="container" style="padding-top: 120px; padding-bottom: 60px;">
+        <div class="section-header" style="text-align: left; margin-bottom: 30px;">
+          <span class="section-badge">Mis Reservaciones</span>
+          <h2 class="section-title">Historial de Reservas</h2>
+          <p class="section-desc">Aquí puedes ver el estado de tus reservaciones en Hotel Luxe</p>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-body" id="cliente-reservas-container">
+            <div class="empty-state">
+              <div class="empty-state-icon">📅</div>
+              <h3>No tienes reservaciones</h3>
+              <p>Busca habitaciones disponibles para reservar tu estadía.</p>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- PERFIL CLIENTE -->
+    <div id="perfil-cliente-page" class="page hidden">
+      <nav class="web-nav">
+        <div class="nav-brand">
+          <span>🏨</span>
+          <span>Hotel Luxe</span>
+        </div>
+        <div class="nav-links-reservas" style="display:flex;align-items:center;gap:20px;">
+          <a href="#" onclick="showPage('web-page')" class="nav-link" style="color:#ffffff; font-weight:600;">← Volver al Portal</a>
+          <button class="btn btn-outline-sm" onclick="logoutCliente()">Cerrar Sesión</button>
+        </div>
+      </nav>
+
+      <div class="container" style="padding-top: 120px; padding-bottom: 60px; max-width: 600px;">
+        <div class="section-header" style="text-align: left; margin-bottom: 30px;">
+          <span class="section-badge">Mi Cuenta</span>
+          <h2 class="section-title">Configuración de Perfil</h2>
+          <p class="section-desc">Mantén tus datos personales actualizados para agilizar tus reservas</p>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-body">
+            <form id="form-perfil-cliente" onsubmit="guardarPerfilCliente(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombres *</label>
+                  <input type="text" id="pc-nombres" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label>Apellidos *</label>
+                  <input type="text" id="pc-apellidos" class="form-input" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Tipo de Documento</label>
+                  <select id="pc-tipo-doc" class="form-input" disabled>
+                    <option value="DNI">DNI</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="CE">C. Extranjería</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>N° Documento</label>
+                  <input type="text" id="pc-nro-doc" class="form-input" disabled>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Teléfono</label>
+                  <input type="tel" id="pc-telefono" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label>Nacionalidad</label>
+                  <input type="text" id="pc-nacionalidad" class="form-input" value="Peruana">
+                </div>
+              </div>
+              <div id="pc-error" class="alert alert-error hidden" style="margin-bottom: 12px;"></div>
+              <button type="submit" class="btn btn-primary btn-full">💾 Guardar Cambios</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD ADMIN/STAFF -->
+    <div id="dashboard-page" class="page hidden">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">🏨</span>
+          <div class="sidebar-brand">
+            <span class="sidebar-name">Hotel Luxe</span>
+            <span class="sidebar-role" id="sidebar-role-badge">Admin</span>
+          </div>
+          <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <span class="nav-label">Principal</span>
+            <a href="#" class="nav-item active" data-view="dashboard" onclick="loadView('dashboard')">
+              <span class="nav-icon">📊</span>
+              <span class="nav-text">Dashboard</span>
+            </a>
+          </div>
+          
+          <div class="nav-section" id="nav-recepcion">
+            <span class="nav-label">Recepción</span>
+            <a href="#" class="nav-item" data-view="reservas" onclick="loadView('reservas')">
+              <span class="nav-icon">📅</span>
+              <span class="nav-text">Reservas</span>
+              <span class="nav-badge" id="badge-reservas">0</span>
+            </a>
+            <a href="#" class="nav-item" data-view="checkin" onclick="loadView('checkin')">
+              <span class="nav-icon">✅</span>
+              <span class="nav-text">Check-In</span>
+            </a>
+            <a href="#" class="nav-item" data-view="estadias" onclick="loadView('estadias')">
+              <span class="nav-icon">🛏️</span>
+              <span class="nav-text">Estadías</span>
+            </a>
+            <a href="#" class="nav-item" data-view="huespedes" onclick="loadView('huespedes')">
+              <span class="nav-icon">👥</span>
+              <span class="nav-text">Huéspedes</span>
+            </a>
+          </div>
+          
+          <div class="nav-section" id="nav-operaciones">
+            <span class="nav-label">Operaciones</span>
+            <a href="#" class="nav-item" data-view="habitaciones" onclick="loadView('habitaciones')">
+              <span class="nav-icon">🏠</span>
+              <span class="nav-text">Habitaciones</span>
+            </a>
+            <a href="#" class="nav-item" data-view="inventario" onclick="loadView('inventario')">
+              <span class="nav-icon">📦</span>
+              <span class="nav-text">Inventario</span>
+            </a>
+            <a href="#" class="nav-item" data-view="ventas" onclick="loadView('ventas')">
+              <span class="nav-icon">🛒</span>
+              <span class="nav-text">Ventas</span>
+            </a>
+          </div>
+          
+          <div class="nav-section" id="nav-admin">
+            <span class="nav-label">Administración</span>
+            <a href="#" class="nav-item" data-view="reportes" onclick="loadView('reportes')">
+              <span class="nav-icon">📈</span>
+              <span class="nav-text">Reportes</span>
+            </a>
+            <a href="#" class="nav-item" data-view="usuarios" onclick="loadView('usuarios')">
+              <span class="nav-icon">👤</span>
+              <span class="nav-text">Usuarios</span>
+            </a>
+            <a href="#" class="nav-item" data-view="configuracion" id="nav-configuracion-link" onclick="loadView('configuracion')">
+              <span class="nav-icon">⚙️</span>
+              <span class="nav-text">Configuración</span>
+            </a>
+          </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="user-avatar">A</div>
+            <div class="user-details">
+              <span class="user-name" id="user-display-name">Admin</span>
+              <span class="user-role" id="user-display-role">Administrador</span>
+            </div>
+          </div>
+          <button class="btn-logout" onclick="logout()" title="Cerrar sesión">🚪</button>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main-content">
+        <header class="main-header">
+          <div class="header-left">
+            <button class="btn-sidebar-toggle mobile-only" onclick="toggleSidebar()">☰</button>
+            <div>
+              <h1 class="page-title" id="page-title">Dashboard</h1>
+              <p class="page-subtitle" id="page-subtitle">Resumen del día</p>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="header-date" id="header-date"></div>
+            <button class="btn btn-sm btn-outline" onclick="loadView(currentView)">🔄 Actualizar</button>
+          </div>
+        </header>
+
+        <!-- Contenido dinámico -->
+        <div class="content-area" id="content-area">
+          <!-- Se carga dinámicamente -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
